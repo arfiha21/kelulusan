@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pengumuman Kelulusan</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #004aad, #00c6ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.card {
+    background: white;
+    width: 400px;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+img {
+    width: 90px;
+}
+h2 {
+    color: #004aad;
+}
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+button {
+    width: 95%;
+    padding: 12px;
+    background: #004aad;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.hasil {
+    margin-top: 20px;
+}
+.lulus {
+    color: green;
+    font-weight: bold;
+    font-size: 20px;
+}
+.tidak {
+    color: red;
+    font-weight: bold;
+    font-size: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <img src="logo.png">
+    <h2>PENGUMUMAN KELULUSAN</h2>
+
+    <input type="text" id="nisn" placeholder="Masukkan NISN">
+    <button onclick="cekData()">Cek Kelulusan</button>
+
+    <div class="hasil" id="hasil"></div>
+</div>
+
+<script>
+let dataSiswa = [];
+
+fetch('data.csv')
+.then(res => res.text())
+.then(text => {
+    let rows = text.split('\n');
+
+    rows.forEach(row => {
+        row = row.replace(/"/g, '').trim(); // HAPUS tanda kutip
+
+        if(row === "" || row.startsWith("no")) return;
+
+        let cols = row.split(',');
+
+        dataSiswa.push({
+            nisn: cols[1],
+            nama: cols[2],
+            status: cols[3]
+        });
+    });
+
+    console.log("Data loaded:", dataSiswa);
+});
+
+function cekData(){
+    let nisn = document.getElementById("nisn").value.trim();
+    let hasil = document.getElementById("hasil");
+
+    let siswa = dataSiswa.find(s => s.nisn === nisn);
+
+    if(siswa){
+        if(siswa.status === "LULUS"){
+            hasil.innerHTML = `
+                <p><strong>${siswa.nama}</strong></p>
+                <p class="lulus">Selamat Anda Lulus</p>
+            `;
+        } else {
+            hasil.innerHTML = `
+                <p><strong>${siswa.nama}</strong></p>
+                <p class="tidak">Mohon Maaf Anda Belum Lulus</p>
+            `;
+        }
+    } else {
+        hasil.innerHTML = `<p style="color:red;">NISN tidak ditemukan!</p>`;
+    }
+}
+</script>
+
+</body>
+</html>
